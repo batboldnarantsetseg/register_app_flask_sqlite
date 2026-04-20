@@ -23,7 +23,6 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_DIR = os.path.join(BASE_DIR, "instance")
 os.makedirs(DB_DIR, exist_ok=True)
 DATABASE = os.path.join(DB_DIR, "register.db")
-DATABASE_URL = os.environ.get("DATABASE_URL")
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-secret-key")
@@ -33,88 +32,31 @@ app.config["ADMIN_PASSWORD"] = os.environ.get("ADMIN_PASSWORD", "admin123")
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 PHONE_REGEX = re.compile(r"^[0-9+\-\s]{8,20}$")
 
-# ---------------------------------------------------------------------------
-# Database abstraction — supports both SQLite (local) and PostgreSQL (prod)
-# ---------------------------------------------------------------------------
 
-if DATABASE_URL:
-    import psycopg2
-    import psycopg2.extras
+def get_db():
+    if "db" not in g:
+        g.db = sqlite3.connect(DATABASE)
+        g.db.row_factory = sqlite3.Row
+    return g.db
 
-    PH = "%s"
-    DB_INTEGRITY_ERROR = psycopg2.IntegrityError
 
-    class _PgConn:
-        """Thin wrapper so callers can use conn.execute() like SQLite."""
-        def __init__(self, raw):
-            self._raw = raw
-            self._cur = raw.cursor()
-
-        def execute(self, sql, params=()):
-            self._cur.execute(sql, params)
-            return self._cur
-
-        def commit(self):
-            self._raw.commit()
-
-        def close(self):
-            self._cur.close()
-            self._raw.close()
-
-    def get_db():
-        if "db" not in g:
-            raw = psycopg2.connect(
-                DATABASE_URL,
-                cursor_factory=psycopg2.extras.RealDictCursor,
-            )
-            g.db = _PgConn(raw)
-        return g.db
-
-    def init_db():
-        raw = psycopg2.connect(DATABASE_URL)
-        cur = raw.cursor()
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS Register (
-                id SERIAL PRIMARY KEY,
-                last_name TEXT NOT NULL,
-                first_name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                created_at TEXT NOT NULL
-            )
-            """
+def init_db():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS Register (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            last_name TEXT NOT NULL,
+            first_name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            created_at TEXT NOT NULL
         )
-        raw.commit()
-        cur.close()
-        raw.close()
-
-else:
-    PH = "?"
-    DB_INTEGRITY_ERROR = sqlite3.IntegrityError
-
-    def get_db():
-        if "db" not in g:
-            g.db = sqlite3.connect(DATABASE)
-            g.db.row_factory = sqlite3.Row
-        return g.db
-
-    def init_db():
-        db = sqlite3.connect(DATABASE)
-        db.execute(
-            """
-            CREATE TABLE IF NOT EXISTS Register (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                last_name TEXT NOT NULL,
-                first_name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                created_at TEXT NOT NULL
-            )
-            """
-        )
-        db.commit()
-        db.close()
+        """
+    )
+    db.commit()
+    db.close()
 
 
 @app.teardown_appcontext
@@ -165,13 +107,13 @@ def index():
         try:
             db = get_db()
             db.execute(
-                f"INSERT INTO Register (last_name, first_name, phone, email, created_at) VALUES ({PH}, {PH}, {PH}, {PH}, {PH})",
+                "INSERT INTO Register (last_name, first_name, phone, email, created_at) VALUES (?, ?, ?, ?, ?)",
                 (last_name, first_name, phone, email, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             )
             db.commit()
             flash("Бүртгэл амжилттай хийгдлээ.", "success")
             return redirect(url_for("index"))
-        except DB_INTEGRITY_ERROR:
+        except sqlite3.IntegrityError:
             flash("Энэ имэйл хаяг өмнө нь бүртгэгдсэн байна.", "danger")
             return render_template("index.html")
 
