@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Бүртгэл{% endblock %}
+{% block content %}
+<section class="hero-card">
+    <div class="hero-copy">
+        <p class="eyebrow">Business Registration</p>
+        <h1>Бүртгэл</h1>
+        <p class="lead">
+            Доорх мэдээллийг үнэн зөв оруулж бүртгэлээ хийнэ үү.
+            Имэйл хаягийг зөв форматаар бичих шаардлагатай.
+        </p>
+        <div class="example-box">
+            <strong>Имэйл формат жишээ:</strong>
+            <span>example@company.com</span>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card" novalidate>
+        <div class="form-group">
+            <label for="last_name">Овог</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Жишээ: Бат" required>
+        </div>
+
+        <div class="form-group">
+            <label for="first_name">Нэр</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Жишээ: Тэмүүлэн" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Утасны дугаар</label>
+            <input type="text" id="phone" name="phone" placeholder="Жишээ: 99112233" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Имэйл</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="example@company.com"
+                pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+                required
+            >
+            <small>Зөв формат: example@company.com</small>
+        </div>
+
+        <button type="submit" class="btn-primary">Register</button>
+    </form>
+</section>
+{% endblock %}

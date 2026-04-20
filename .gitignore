@@ -1,0 +1,7 @@
+register_app/venv/
+register_app/instance/
+register_app/__pycache__/
+register_app/tests/__pycache__/
+*.pyc
+*.pyo
+.env

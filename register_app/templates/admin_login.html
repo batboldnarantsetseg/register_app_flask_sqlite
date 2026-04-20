@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<section class="center-wrap">
+    <form method="POST" class="form-card admin-card">
+        <h1>Admin Login</h1>
+        <p class="muted">Бүртгэлийн мэдээлэл харах болон Excel татах хэсэг.</p>
+
+        <div class="form-group">
+            <label for="username">Нэвтрэх нэр</label>
+            <input type="text" id="username" name="username" placeholder="admin" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Нууц үг</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Нэвтрэх</button>
+        <div class="hint-box">
+            <strong>Default:</strong> admin / admin123
+        </div>
+    </form>
+</section>
+{% endblock %}

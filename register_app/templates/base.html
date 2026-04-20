@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Register{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a href="{{ url_for('index') }}" class="brand">REGISTER</a>
+            <nav>
+                <a href="{{ url_for('index') }}">Бүртгэл</a>
+                <a href="{{ url_for('admin_login') }}">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alerts">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

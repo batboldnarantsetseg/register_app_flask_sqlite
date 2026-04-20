@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-header">
+    <div>
+        <p class="eyebrow">Admin Panel</p>
+        <h1>Бүртгэлийн жагсаалт</h1>
+        <p class="muted">Нийт бүртгэл: {{ registrations|length }}</p>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('export_excel') }}" class="btn-primary">Excel татах</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn-secondary">Гарах</a>
+    </div>
+</section>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Овог</th>
+                <th>Нэр</th>
+                <th>Утас</th>
+                <th>Имэйл</th>
+                <th>Огноо</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in registrations %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.last_name }}</td>
+                <td>{{ item.first_name }}</td>
+                <td>{{ item.phone }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.created_at }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="empty">Одоогоор бүртгэл алга байна.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
