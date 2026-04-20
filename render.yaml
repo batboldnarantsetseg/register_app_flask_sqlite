@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: register-app
+    runtime: python
+    buildCommand: pip install -r register_app/requirements.txt
+    startCommand: gunicorn --chdir register_app app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true
